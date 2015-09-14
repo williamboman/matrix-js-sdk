@@ -1,4 +1,12 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (global){
+var matrixcs = require("./lib/matrix");
+matrixcs.request(require("browser-request"));
+module.exports = matrixcs; // keep export for browserify package deps
+global.matrixcs = matrixcs;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./lib/matrix":4,"browser-request":15}],2:[function(require,module,exports){
 "use strict";
 /**
  * This is an internal module. See {@link MatrixClient} for the public class.
@@ -877,6 +885,18 @@ MatrixClient.prototype.loginWithPassword = function(user, password, callback) {
     }, callback);
 };
 
+/**
+ * @param {string} relayState URL Callback after SAML2 Authentication
+ * @param {module:client.callback} callback Optional.
+ * @return {module:client.Promise} Resolves: TODO
+ * @return {module:http-api.MatrixError} Rejects: with an error response.
+ */
+MatrixClient.prototype.loginWithSAML2 = function(relayState, callback) {
+    return this.login("m.login.saml2", {
+        relay_state: relayState
+    }, callback);
+};
+
 // Push operations
 // ===============
 
@@ -1428,7 +1448,7 @@ module.exports.MatrixClient = MatrixClient;
   * @property {Function} done promise.done(onFulfilled, onRejected, onProgress)
   */
 
-},{"./http-api":2,"./models/event":4,"./models/room":8,"./models/user":9,"./store/stub":12,"./utils":13,"events":15,"q":17}],2:[function(require,module,exports){
+},{"./http-api":3,"./models/event":5,"./models/room":9,"./models/user":10,"./store/stub":13,"./utils":14,"events":16,"q":18}],3:[function(require,module,exports){
 "use strict";
 /**
  * This is an internal module. See {@link MatrixHttpApi} for the public class.
@@ -1742,7 +1762,7 @@ module.exports.MatrixError.prototype = Object.create(Error.prototype);
 /** */
 module.exports.MatrixError.prototype.constructor = module.exports.MatrixError;
 
-},{"./utils":13,"q":17}],3:[function(require,module,exports){
+},{"./utils":14,"q":18}],4:[function(require,module,exports){
 "use strict";
 
 /** The {@link module:models/event.MatrixEvent|MatrixEvent} class. */
@@ -1835,7 +1855,7 @@ module.exports.createClient = function(opts) {
   * @param {Object} body The parsed HTTP response body.
   */
 
-},{"./client":1,"./http-api":2,"./models/event":4,"./models/room":8,"./models/room-member":5,"./models/room-state":6,"./models/user":9,"./scheduler":10,"./store/memory":11}],4:[function(require,module,exports){
+},{"./client":2,"./http-api":3,"./models/event":5,"./models/room":9,"./models/room-member":6,"./models/room-state":7,"./models/user":10,"./scheduler":11,"./store/memory":12}],5:[function(require,module,exports){
 "use strict";
 /**
  * This is an internal module. See {@link MatrixEvent} and {@link RoomEvent} for
@@ -1981,7 +2001,7 @@ module.exports.MatrixEvent.prototype = {
     }
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 /**
  * @module models/room-member
@@ -2184,7 +2204,7 @@ module.exports = RoomMember;
  * });
  */
 
-},{"../utils":13,"events":15}],6:[function(require,module,exports){
+},{"../utils":14,"events":16}],7:[function(require,module,exports){
 "use strict";
 /**
  * @module models/room-state
@@ -2381,7 +2401,7 @@ module.exports = RoomState;
  * });
  */
 
-},{"../utils":13,"./room-member":5,"events":15}],7:[function(require,module,exports){
+},{"../utils":14,"./room-member":6,"events":16}],8:[function(require,module,exports){
 "use strict";
 /**
  * @module models/room-summary
@@ -2410,7 +2430,7 @@ function RoomSummary(roomId, info) {
  */
 module.exports = RoomSummary;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 /**
  * @module models/room
@@ -2686,7 +2706,7 @@ module.exports = Room;
  * });
  */
 
-},{"../utils":13,"./room-state":6,"./room-summary":7,"events":15}],9:[function(require,module,exports){
+},{"../utils":14,"./room-state":7,"./room-summary":8,"events":16}],10:[function(require,module,exports){
 "use strict";
 /**
  * @module models/user
@@ -2795,7 +2815,7 @@ module.exports = User;
  * });
  */
 
-},{"../utils":13,"events":15}],10:[function(require,module,exports){
+},{"../utils":14,"events":16}],11:[function(require,module,exports){
 "use strict";
 /**
  * This is an internal module which manages queuing, scheduling and retrying
@@ -3045,7 +3065,7 @@ function debuglog() {
  */
 module.exports = MatrixScheduler;
 
-},{"./utils":13,"q":17}],11:[function(require,module,exports){
+},{"./utils":14,"q":18}],12:[function(require,module,exports){
 "use strict";
 /**
  * This is an internal module. See {@link MatrixInMemoryStore} for the public class.
@@ -3127,7 +3147,7 @@ module.exports.MatrixInMemoryStore.prototype = {
     //reapOldMessages: function() {},
 };
 
-},{"../utils":13}],12:[function(require,module,exports){
+},{"../utils":14}],13:[function(require,module,exports){
 "use strict";
 /**
  * This is an internal module.
@@ -3202,7 +3222,7 @@ StubStore.prototype = {
 /** Stub Store class. */
 module.exports = StubStore;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 /**
  * This is an internal module.
@@ -3536,7 +3556,7 @@ module.exports.inherits = function(ctor, superCtor) {
     });
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -4032,7 +4052,7 @@ function b64_enc (data) {
 }));
 //UMD FOOTER END
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4335,7 +4355,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -4368,7 +4388,9 @@ function drainQueue() {
         currentQueue = queue;
         queue = [];
         while (++queueIndex < len) {
-            currentQueue[queueIndex].run();
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
         }
         queueIndex = -1;
         len = queue.length;
@@ -4420,14 +4442,13 @@ process.binding = function (name) {
     throw new Error('process.binding is not supported');
 };
 
-// TODO(shtylman)
 process.cwd = function () { return '/' };
 process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 process.umask = function() { return 0; };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -6479,12 +6500,4 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":16}],18:[function(require,module,exports){
-(function (global){
-var matrixcs = require("./lib/matrix");
-matrixcs.request(require("browser-request"));
-module.exports = matrixcs; // keep export for browserify package deps
-global.matrixcs = matrixcs;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/matrix":3,"browser-request":14}]},{},[18]);
+},{"_process":17}]},{},[1]);
